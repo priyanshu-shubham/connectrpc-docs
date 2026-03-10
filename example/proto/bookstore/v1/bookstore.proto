@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package bookstore.v1;
+
+// Service for managing a bookstore catalog.
+service BookstoreService {
+  // Create a new book in the catalog.
+  rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
+
+  // Get a book by its ID.
+  rpc GetBook(GetBookRequest) returns (GetBookResponse);
+
+  // List all books, optionally filtered by author.
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
+
+  // Update an existing book's details.
+  rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
+
+  // Delete a book from the catalog.
+  rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
+}
+
+// A book in the catalog.
+message Book {
+  // Unique identifier for the book.
+  string id = 1;
+
+  // Title of the book.
+  string title = 2;
+
+  // Author of the book.
+  string author = 3;
+
+  // ISBN-13 identifier.
+  string isbn = 4;
+
+  // Total number of pages.
+  int32 pages = 5;
+
+  // Genre classification.
+  Genre genre = 6;
+
+  // Year the book was published.
+  int32 year_published = 7;
+
+  // Whether the book is currently available.
+  bool available = 8;
+}
+
+// Genre classification for books.
+enum Genre {
+  // Unspecified genre.
+  GENRE_UNSPECIFIED = 0;
+
+  // Fiction literature.
+  GENRE_FICTION = 1;
+
+  // Non-fiction literature.
+  GENRE_NON_FICTION = 2;
+
+  // Science fiction.
+  GENRE_SCIENCE_FICTION = 3;
+
+  // Fantasy literature.
+  GENRE_FANTASY = 4;
+
+  // Mystery and thriller.
+  GENRE_MYSTERY = 5;
+
+  // Biography and memoir.
+  GENRE_BIOGRAPHY = 6;
+
+  // Technical and programming.
+  GENRE_TECHNICAL = 7;
+}
+
+message CreateBookRequest {
+  // Title of the book to create.
+  string title = 1;
+
+  // Author of the book.
+  string author = 2;
+
+  // ISBN-13 identifier.
+  string isbn = 3;
+
+  // Total number of pages.
+  int32 pages = 4;
+
+  // Genre classification.
+  Genre genre = 5;
+
+  // Year the book was published.
+  int32 year_published = 6;
+}
+
+message CreateBookResponse {
+  // The created book with its assigned ID.
+  Book book = 1;
+}
+
+message GetBookRequest {
+  // ID of the book to retrieve.
+  string id = 1;
+}
+
+message GetBookResponse {
+  // The requested book.
+  Book book = 1;
+}
+
+message ListBooksRequest {
+  // Optional: filter by author name (case-insensitive substring match).
+  string author_filter = 1;
+
+  // Optional: filter by genre.
+  Genre genre_filter = 2;
+
+  // Maximum number of books to return. Defaults to 20.
+  int32 page_size = 3;
+
+  // Pagination token from a previous ListBooks response.
+  string page_token = 4;
+}
+
+message ListBooksResponse {
+  // The list of books matching the filters.
+  repeated Book books = 1;
+
+  // Token for the next page of results. Empty if no more pages.
+  string next_page_token = 2;
+
+  // Total number of books matching the filters.
+  int32 total_count = 3;
+}
+
+message UpdateBookRequest {
+  // ID of the book to update.
+  string id = 1;
+
+  // New title. Leave empty to keep existing.
+  string title = 2;
+
+  // New author. Leave empty to keep existing.
+  string author = 3;
+
+  // New availability status.
+  bool available = 4;
+}
+
+message UpdateBookResponse {
+  // The updated book.
+  Book book = 1;
+}
+
+message DeleteBookRequest {
+  // ID of the book to delete.
+  string id = 1;
+}
+
+// Empty response for successful deletion.
+message DeleteBookResponse {}
