@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { ChevronRight, FlaskConical } from "lucide-react";
+import { ChevronRight, FlaskConical, Lock } from "lucide-react";
 
 interface MethodDocsProps {
   service: ServiceInfo;
@@ -47,6 +47,24 @@ export function MethodDocs({
               </Button>
             )}
           </div>
+
+          {method.auth && (
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              <Badge variant="secondary" className="gap-1 text-[10px]">
+                <Lock className="size-3" />
+                Auth required
+              </Badge>
+              {method.auth.roles.map((role) => (
+                <Badge
+                  key={role}
+                  variant="outline"
+                  className="font-mono text-[10px]"
+                >
+                  role: {role}
+                </Badge>
+              ))}
+            </div>
+          )}
 
           {method.comment && (
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">

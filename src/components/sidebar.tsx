@@ -14,6 +14,7 @@ import {
   Monitor,
   Search,
   X,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -170,6 +171,12 @@ export function Sidebar({
                                 POST
                               </Badge>
                               <span className="truncate">{method.name}</span>
+                              {method.auth && (
+                                <Lock
+                                  className="ml-auto size-3 shrink-0 text-muted-foreground"
+                                  aria-label="Authentication required"
+                                />
+                              )}
                             </div>
                             {method.comment && (
                               <p className="truncate pl-[38px] text-[11px] text-muted-foreground">

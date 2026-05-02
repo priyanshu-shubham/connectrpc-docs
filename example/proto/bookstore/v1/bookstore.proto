@@ -5,6 +5,7 @@ package bookstore.v1;
 // Service for managing a bookstore catalog.
 service BookstoreService {
   // Create a new book in the catalog.
+  // @role admin, librarian
   rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
 
   // Get a book by its ID.
@@ -14,9 +15,11 @@ service BookstoreService {
   rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
 
   // Update an existing book's details.
+  // @role admin, librarian
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
 
   // Delete a book from the catalog.
+  // @role admin
   rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
 }
 

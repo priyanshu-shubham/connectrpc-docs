@@ -17,6 +17,45 @@ export interface MethodInfo {
   comment: string;
   requestType: MessageInfo;
   responseType: MessageInfo;
+  auth?: AuthInfo;
+}
+
+export interface AuthInfo {
+  required: boolean;
+  roles: string[];
+}
+
+function parseAuthAnnotations(comment: string): {
+  comment: string;
+  auth?: AuthInfo;
+} {
+  if (!comment) return { comment };
+  const lines = comment.split("\n");
+  const kept: string[] = [];
+  let required = false;
+  const roles: string[] = [];
+
+  for (const raw of lines) {
+    const trimmed = raw.trim();
+    if (/^@auth\b/i.test(trimmed)) {
+      required = true;
+      continue;
+    }
+    const roleMatch = trimmed.match(/^@role\s+(.+)$/i);
+    if (roleMatch) {
+      required = true;
+      for (const r of roleMatch[1]!.split(",")) {
+        const role = r.trim();
+        if (role && !roles.includes(role)) roles.push(role);
+      }
+      continue;
+    }
+    kept.push(raw);
+  }
+
+  const cleaned = kept.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  if (!required && roles.length === 0) return { comment: cleaned };
+  return { comment: cleaned, auth: { required, roles } };
 }
 
 export interface MessageInfo {
@@ -142,16 +181,18 @@ export function parseProtos(files: Record<string, string>): ProtoSchema {
 
         for (const method of nested.methodsArray) {
           method.resolve();
+          const { comment, auth } = parseAuthAnnotations(method.comment || "");
           methods.push({
             name: method.name,
             path: `/${fullName}/${method.name}`,
-            comment: method.comment || "",
+            comment,
             requestType: extractMessageInfo(
               method.resolvedRequestType as protobuf.Type
             ),
             responseType: extractMessageInfo(
               method.resolvedResponseType as protobuf.Type
             ),
+            auth,
           });
         }
 
