@@ -97,8 +97,31 @@ function extractMessageInfo(
   return { name: type.name, comment: type.comment || "", fields, oneofs };
 }
 
+const COMMON_WKT_FILES = [
+  "google/protobuf/any.proto",
+  "google/protobuf/duration.proto",
+  "google/protobuf/empty.proto",
+  "google/protobuf/field_mask.proto",
+  "google/protobuf/struct.proto",
+  "google/protobuf/timestamp.proto",
+  "google/protobuf/wrappers.proto",
+];
+
+function loadWellKnownTypes(root: protobuf.Root) {
+  const common = (protobuf as unknown as {
+    common: { get(file: string): { nested?: protobuf.AnyNestedObject } | null };
+  }).common;
+  for (const file of COMMON_WKT_FILES) {
+    const json = common.get(file);
+    if (json?.nested) {
+      root.addJSON(json.nested as { [k: string]: protobuf.AnyNestedObject });
+    }
+  }
+}
+
 export function parseProtos(files: Record<string, string>): ProtoSchema {
   const root = new protobuf.Root();
+  loadWellKnownTypes(root);
 
   for (const content of Object.values(files)) {
     protobuf.parse(content, root, { keepCase: true, alternateCommentMode: true });
