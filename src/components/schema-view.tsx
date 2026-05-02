@@ -108,6 +108,11 @@ function FieldRow({ field, depth }: { field: FieldInfo; depth: number }) {
                 repeated
               </Badge>
             )}
+            {field.optional && (
+              <Badge variant="secondary" className="px-1 py-0 text-[9px]">
+                optional
+              </Badge>
+            )}
             {field.oneofName && (
               <Badge variant="outline" className="px-1 py-0 text-[9px]">
                 oneof:{field.oneofName}

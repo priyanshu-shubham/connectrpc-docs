@@ -36,6 +36,7 @@ export interface FieldInfo {
   type: string;
   repeated: boolean;
   map: boolean;
+  optional: boolean;
   mapKeyType?: string;
   comment: string;
   messageType?: MessageInfo;
@@ -55,11 +56,13 @@ function extractMessageInfo(
   const fields: FieldInfo[] = [];
   for (const field of type.fieldsArray) {
     field.resolve();
+    const synthetic = field.partOf?.isProto3Optional === true;
     const info: FieldInfo = {
       name: field.name,
       type: field.type,
       repeated: field.repeated,
       map: field instanceof protobuf.MapField,
+      optional: synthetic,
       comment: field.comment || "",
     };
 
@@ -67,7 +70,7 @@ function extractMessageInfo(
       info.mapKeyType = field.keyType;
     }
 
-    if (field.partOf) {
+    if (field.partOf && !synthetic) {
       info.oneofName = field.partOf.name;
     }
 
@@ -87,6 +90,7 @@ function extractMessageInfo(
   const oneofs: OneofInfo[] = [];
   if (type.oneofsArray) {
     for (const oneof of type.oneofsArray) {
+      if (oneof.isProto3Optional) continue;
       oneofs.push({
         name: oneof.name,
         fieldNames: oneof.fieldsArray.map((f) => f.name),
